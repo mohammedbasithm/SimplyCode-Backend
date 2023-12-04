@@ -32,7 +32,7 @@ urlpatterns = [
     path('api/',include('users.urls')),
     path('api/teacher/',include('teacher.urls')),
     path('api/admin/',include('adminside.urls')),
-    path('api/',include('courses.urls')),
+    path('api/course/',include('courses.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

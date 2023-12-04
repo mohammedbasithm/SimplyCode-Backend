@@ -28,6 +28,6 @@ class Chapter(models.Model):
     chapter=models.CharField(max_length=255)
 
     def __str__(self):
-        return self.course.title
+        return self.chapter
     
     
