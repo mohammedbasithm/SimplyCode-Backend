@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serilizers import UserListSerializers
 from rest_framework.permissions import IsAuthenticated
-
+from courses.models import Course
+from courses.serializers import CourseSerializer
 
 # Create your views here.
    
@@ -91,3 +92,25 @@ class SetNewPassword(APIView):
             user.set_password(password)
             user.save()
         return Response({'success':'success the changing password'},status=status.HTTP_200_OK)
+    
+class FetchCourse(APIView):
+    def get(self,request):
+        try:
+            course=Course.objects.all()
+            serializer=CourseSerializer(course,many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+class CourseDetails(APIView):
+    def get(self,request):
+        try:
+            course_id=request.query_params.get('id')
+            course=Course.objects.get(pk=course_id)
+            print(course_id)
+            serializer=CourseSerializer(course)
+            
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)

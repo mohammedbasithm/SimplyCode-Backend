@@ -95,14 +95,14 @@ class RegisterView(APIView):
             })
             myuser.email_user(email_subject,message2)
             
-            print(')))))))))))))')
-            email = EmailMessage(
-                email_subject,message2,
-                settings.EMAIL_HOST_USER,
-                [myuser.email] 
-            )
-            email.fail_silently = True
-            email.send()
+            # print(')))))))))))))')
+            # email = EmailMessage(
+            #     email_subject,message2,
+            #     settings.EMAIL_HOST_USER,
+            #     [myuser.email] 
+            # )
+            # email.fail_silently = True
+            # email.send()
 
             print("-----3-----------------")
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
@@ -169,7 +169,7 @@ class ForgotPasswordView(APIView):
             myuser=CustomUser.objects.get(email=email)
             print(',,,,,,,,>')
             current_site=get_current_site(request)
-            email_subject='Confirm Your email @simply code'
+            email_subject='Confirm Your Email for Password Reset'
             message2=render_to_string('forgot_password_mail.html',{
                 'name':myuser.username,
                 'domain':current_site.domain,

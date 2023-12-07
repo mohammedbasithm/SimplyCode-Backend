@@ -19,10 +19,10 @@ class AddCourse(APIView):
             description=request.data.get('description')
             about=request.data.get('about')
             coverimage=request.data.get('coverimage')
-
+            print('/////////////')
             user_id=request.data.get('user_id')
             teacher=CustomUser.objects.get(pk=user_id)
-
+            print('/////////////')
             Course.objects.create(
                 title=courseName,
                 category=category,
@@ -33,6 +33,7 @@ class AddCourse(APIView):
                 about=about
 
             )
+            print('/////////////')
             return Response({'message':'Course submission Successfuly..'},status=status.HTTP_200_OK)
         except Exception:
             return Response({'error':'Submission Faild..'},status=status.HTTP_400_BAD_REQUEST)

@@ -4,4 +4,4 @@ from authentification.models import CustomUser  # Adjust this import based on yo
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email','approvel','rejected','qualification','id_proof','certificate','teacher_request','phone']
+        fields = ['id','is_active', 'username', 'email','approvel','rejected','qualification','id_proof','certificate','teacher_request','phone']

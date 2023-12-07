@@ -91,3 +91,69 @@ class TeacherApprovel(APIView):
                 return Response({'teacher':serializer.data,'message':'success the approvel'},status=status.HTTP_200_OK)
         except Exception:
             return Response({'message':'somthing problem'},status=status.HTTP_400_BAD_REQUEST)
+
+class TeacherReject(APIView):
+    def put(self,request):
+        try:
+            teacher_id=request.data.get('id')
+            print('teacher_id:',teacher_id)
+            user=CustomUser.objects.get(pk=teacher_id)
+            print(user)
+            send_mail(
+                f'Hi {user.username}',
+                'We regret to inform you that your account approval request has been declined. Unfortunately, your application did not meet our current criteria. If you believe this decision is in error or would like more information, please contact our support team. Thank you for your interest in our platform.',
+
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                fail_silently=False,
+            )
+            user.delete()
+            return Response({'message':'rejected successfully'},status=status.HTTP_200_OK)
+        except Exception:
+            return Response({'error':'rejected faild '},status=status.HTTP_400_BAD_REQUEST)
+
+class TeacherList(APIView):
+    def get(self,request):
+        try:
+            teacherData=CustomUser.objects.filter(approvel=True)
+            serializer=CustomUserSerializer(teacherData,many=True)
+            print(teacherData)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+class TeacherBlock(APIView):
+    def put(self,request):
+        try:
+            teacher_id=request.data.get('id')
+            user=CustomUser.objects.get(pk=teacher_id)
+            user.is_active=False
+            user.save()
+            return Response({'message':'teacher blocked success fully'},status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response({'error':'user not found '},status=status.HTTP_400_BAD_REQUEST)
+
+class TeacherUnblock(APIView):
+    def put(self,request):
+        try:
+            teacher_id=request.data.get('id')
+            user=CustomUser.objects.get(pk=teacher_id)
+            user.is_active=True
+            user.save()
+            return Response({'message':'teacher unblock success '},status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response({'error':'user not found '},status=status.HTTP_400_BAD_REQUEST)
+
+class TeacherDetails(APIView):
+    def get(self,request):
+        try:
+            print('------------')
+            teacher_id=request.GET.get('id')
+            print(teacher_id)
+            teacherData=CustomUser.objects.get(pk=teacher_id)
+            serializer=CustomUserSerializer(teacherData)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
