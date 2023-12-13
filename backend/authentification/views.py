@@ -28,9 +28,9 @@ class HomeView(APIView):
         return Response(content)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    print('1----------')
+   
     serializer_class = CustomTokenObtainPairSerializer
-    print('2-2---------')
+    
     def post(self, request, *args, **kwargs):
         print('3----------')
         response = super().post(request, *args, **kwargs)

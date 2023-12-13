@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'teacher',
     'adminside',
     'courses',
+    'payments',
 ]
 
 MEDIA_URL = '/media/'
@@ -58,7 +59,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # Add your frontend URL here
-    
+    "https://stripe.com",
 ]
 
 MIDDLEWARE = [
@@ -172,3 +173,19 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STRIPE_SECRET_KEY='sk_test_51OLLhGSFhIO2OA3psGRDTmh0W7KV6vSVED6l1DTHLtXMrxYHaxY6PjQnFDXcDSddnpS1mDfavBkY3U6BtRQow4bl00rYutpbL9'
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'access-control-allow-origin',
+    'access-control-allow-headers',
+    'content-type',
+    'your-other-headers',
+]

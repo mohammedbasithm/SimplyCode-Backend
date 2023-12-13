@@ -50,7 +50,7 @@ class ListCourse(AddCourse):
             print(user_id)
             user=CustomUser.objects.get(pk=user_id)
             print(user)
-            course=Course.objects.filter(instructor=user)
+            course=Course.objects.filter(instructor=user,is_completed=False)
             print(course)
             serializer=CourseSerializer(course,many=True)
 
@@ -104,3 +104,27 @@ class FetchChapter(APIView):
         except Exception as e:
             print(e)
             return Response({'error':'fetching data faild'},status=status.HTTP_400_BAD_REQUEST)
+
+class CourseCompleted(APIView):
+    def put(self,request):
+        try:
+            course_id=request.data.get('id')
+            print(course_id)
+            course=Course.objects.get(pk=course_id)
+            course.is_completed=True
+            course.save()
+            return Response({'message':'course completed success '},status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response({'error':'course completed faild'},status=status.HTTP_400_BAD_REQUEST)
+
+class CourseCompletedList(APIView):
+    def get(self,request):
+        try:
+            teacher_id=request.query_params.get('user_id')
+            teacher=CustomUser.objects.get(pk=teacher_id)
+            course=Course.objects.filter(instructor=teacher,is_completed=True)
+            serializer=CourseSerializer(course,many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error':e},status=status.HTTP_400_BAD_REQUEST)

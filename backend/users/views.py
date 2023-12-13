@@ -96,7 +96,7 @@ class SetNewPassword(APIView):
 class FetchCourse(APIView):
     def get(self,request):
         try:
-            course=Course.objects.all()
+            course=Course.objects.filter(is_completed=True)
             serializer=CourseSerializer(course,many=True)
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception:

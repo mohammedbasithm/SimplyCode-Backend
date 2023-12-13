@@ -17,6 +17,8 @@ class Course(models.Model):
     price=models.DecimalField(max_digits=10,decimal_places=2,default=0.00)
     cover_image=models.ImageField(upload_to='course_cover_img/')
     about=models.CharField(blank=True,null=True)
+    is_completed=models.BooleanField(default=False)
+    is_subscripe=models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

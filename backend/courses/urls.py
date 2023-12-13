@@ -10,4 +10,6 @@ urlpatterns = [
      path('coursedetails',CourseDetails.as_view(),name='coursedetails'),
      path('addchapter',AddChapter.as_view(),name='addchapter'),
      path('fetchchapter',FetchChapter.as_view(),name='fetchchapter'),
+     path('course-completed',CourseCompleted.as_view(),name="course-completed"),
+     path('coures-completedlist',CourseCompletedList.as_view(),name='runningclass'),
 ]
