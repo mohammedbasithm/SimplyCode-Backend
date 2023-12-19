@@ -10,4 +10,5 @@ urlpatterns = [
     path('setnew-password',SetNewPassword.as_view(),name='setnew-pass'),
     path('user/fetchcourse',FetchCourse.as_view(),name='fetchcourse'),
     path('user/coursedetails',CourseDetails.as_view(),name='coursedetails'),
+    path('user/mycourse',MyCourse.as_view()),
 ]   

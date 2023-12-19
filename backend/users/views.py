@@ -96,8 +96,9 @@ class SetNewPassword(APIView):
 class FetchCourse(APIView):
     def get(self,request):
         try:
-            course=Course.objects.filter(is_completed=True)
-            serializer=CourseSerializer(course,many=True)
+            courses=Course.objects.filter(is_completed=True)
+            serializer=CourseSerializer(courses,many=True)
+            print(serializer.data)
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -107,10 +108,29 @@ class CourseDetails(APIView):
         try:
             course_id=request.query_params.get('id')
             course=Course.objects.get(pk=course_id)
-            print(course_id)
             serializer=CourseSerializer(course)
             
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+class MyCourse(APIView):
+    def get(self,request):
+        try:
+            print("))))))))))))))))0")
+            user_id = request.query_params.get('user_id')
+            print("+++++++++++",user_id)
+            user=CustomUser.objects.get(pk=user_id)
+            print('------->')
+            mycourse=Course.objects.filter(
+                payments__user_id=user_id,
+                payments__status='success',
+                payments__is_paid=True  
+            ).distinct()
+            print(mycourse)
+            
+            serializer=CourseSerializer(mycourse,many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except:
+            return Response({'error':'my course fetching faild'},status=status.HTTP_400_BAD_REQUEST)

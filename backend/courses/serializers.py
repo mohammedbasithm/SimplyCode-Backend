@@ -7,9 +7,10 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = 'category','cover_image'
 
 class CourseSerializer(serializers.ModelSerializer):
+    instructor_username = serializers.CharField(source='instructor.username', read_only=True)
     class Meta:
         model= Course
-        fields='id','title','is_completed','is_subscripe','category','description','instructor','price','cover_image','about'
+        fields='id','instructor_username','title','is_completed','is_subscripe','category','description','instructor','price','cover_image','about'
 
 class ChapterSerilizer(serializers.ModelSerializer):
     class Meta:

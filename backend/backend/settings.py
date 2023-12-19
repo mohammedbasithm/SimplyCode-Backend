@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'authentification',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
@@ -50,7 +49,18 @@ INSTALLED_APPS = [
     'adminside',
     'courses',
     'payments',
+    'chat',
+    'channels',
+    'daphne',
+    'django.contrib.staticfiles',
 ]
+ASGI_APPLICATION = "backend.asgi.application"
+WSGI_APPLICATION = 'backend.wsgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+        }
+    }
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
@@ -168,7 +178,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = BASE_DIR / "static"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
