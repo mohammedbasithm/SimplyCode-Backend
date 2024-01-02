@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from .serializers import CategorySerializer,CourseSerializer,ChapterSerilizer
 from authentification.models import CustomUser
 from rest_framework import status
+from payments.models import Payments
+from payments.serializer import PaymentSerializer
 
 # Create your views here.
 class AddCourse(APIView):
@@ -69,6 +71,7 @@ class CourseDetails(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception:
             return Response({'error':'fetching data faild'},status=status.HTTP_400_BAD_REQUEST)
+import json
 class AddChapter(APIView):
     def post(self,request):
         try:
@@ -76,13 +79,15 @@ class AddChapter(APIView):
             chaptername=request.data.get('chapterName')
             description=request.data.get('description')
             videos=request.data.get('videos')
-            print('-------------><-------------')
+            is_free=request.data.get('is_free')
+            print('-------------><-------------',json.loads(is_free))
             course=Course.objects.get(pk=course_id)
             Chapter.objects.create(
                 course=course,
                 videos=videos,
                 description=description,
-                chapter=chaptername
+                chapter=chaptername,
+                is_free=json.loads(is_free)
             )
             return Response({'message':'success the add course'},status=status.HTTP_200_OK)
         except Exception:
@@ -92,12 +97,12 @@ class FetchChapter(APIView):
     def get(self,request):
         try:
             print('==============>>')
-            course_id=request.query_params.get('id')
+            course_id=request.query_params.get('courseId')
             print('--------------->/',course_id)
             course=Course.objects.get(pk=course_id)
-            print(course)
+            
             chapters=Chapter.objects.filter(course=course)
-            print(chapters)
+            
             serializer=ChapterSerilizer(chapters,many=True)
 
             return Response(serializer.data,status=status.HTTP_200_OK)
@@ -128,3 +133,36 @@ class CourseCompletedList(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error':e},status=status.HTTP_400_BAD_REQUEST)
+        
+class FetchPaymentData(APIView):
+    def get(self, request):
+        try:
+            user_id = request.query_params.get('user_id')
+            course_id = request.query_params.get('course_id')
+
+            print('course:', course_id, ', user:', user_id)
+            course = Course.objects.get(pk=course_id)
+            user = CustomUser.objects.get(pk=user_id)
+            print(course)
+            print('user:', user)
+            
+            # Fetch a single payment object
+            payment_data = Payments.objects.get(course=course, user=user)
+            
+            # Serialize the single payment object
+            serializer = PaymentSerializer(payment_data)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Course.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Payments.DoesNotExist:
+            return Response({'error': 'Payment data not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            print('Error:', e)
+            return Response({'error': 'An error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -4,4 +4,5 @@ from .views import*
 urlpatterns = [
     path('chat/fetchRoom',FetchChatRoom.as_view(),name='fetch-room'),
     path('chat/fetchMessage',FetchMessage.as_view(),name='fetchMessage'),
+    path('userName',GetUsername.as_view(), name='get_username'),
 ]

@@ -2,13 +2,16 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from .models import *
-
+# import datetime
+import pytz
+from datetime import datetime
 class TextRoomConsumer(WebsocketConsumer):
-    async def connect(self):
+    def connect(self):
         print('reached the consumer ------------------------------------------------------ ')
 
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = f"chat_{self.room_name}"
+        self.room_id = self.scope['url_route']['kwargs']['room_name']
+        self.room_group_name = f"chat_{self.room_id}"
+        print('room_id:',self.room_id)
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
@@ -17,61 +20,58 @@ class TextRoomConsumer(WebsocketConsumer):
         self.accept()
 
         
-    async def disconnect(self, close_code):
+    def disconnect(self, close_code):
         # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
 
-    async def receive(self, text_data):
+    def receive(self, text_data):
         # Receive message from WebSocket
         text_data_json = json.loads(text_data)
         text = text_data_json['text']
-        sender_id= text_data_json['sender']
-        group_id = text_data_json['group_id']
+        sender_name= text_data_json['sender']
 
-        sender=CustomUser.objects.get(id=sender_id)
-        group = Group.objects.get(id=group_id)
+        print("group_id:",self.room_id)
+        sender=CustomUser.objects.get(username=sender_name)
+        group = Group.objects.get(id=self.room_id)
+
+        # utc_now = datetime.datetime.utcnow()
+        india_tz = pytz.timezone('Asia/Kolkata')
+        indian_time = datetime.now(india_tz)
+        # current_time = ist_now.strftime('%Y-%m-%d_%I:%M %p')
+        # time_part = current_time.split('_')[1] 
+        timestamp = indian_time.isoformat()
 
         message=Message.objects.create(
             sender=sender,
             group=group,
-            message_content=text
+            message_content=text,
+            timestamp=timestamp
         )
         # Serialize the message data
-        message_data = {
-            'text': message.message_content,
-            'sender': message.sender.username,
-            'timestamp': message.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-            'group_id': message.group.pk  
-        }
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+        {
+            'type': 'chat_message',
+            'message':text,
+            'sender': sender_name,
+            'timestamp': timestamp 
+        })
 
-        # Send message to room group
-        # async_to_sync(self.channel_layer.group_send)(
-        #     self.room_group_name,
-        #     {
-        #         'type': 'chat_message',
-        #         'message': text,
-        #         'sender': sender
-        #     }
-        # )
-        await self.channel_layer.group_send(
-            f"chat_{group_id}",
-            {
-                'type': 'chat_message',
-                'message': message_data
-            }
-        )
+        
+    def chat_message(self, event):
+        # Receive message from room group
+        text = event['message']
+        print("text:",text)
+        sender = event['sender']
+        timestamp = event['timestamp']
 
-    async def chat_message(self, event):
-        # # Receive message from room group
-        # text = event['message']
-        # print('text:',text)
-        # sender = event['sender']
-        # # Send message to WebSocket
-        # self.send(text_data=json.dumps({
-        #     'text': text,
-        #     'sender': sender
-        # }))
-        await self.send(text_data=json.dumps(event['message']))
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({
+            'text': text,
+            'sender': sender,
+            'timestamp': timestamp
+        }))
+       

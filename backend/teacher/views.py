@@ -4,6 +4,10 @@ from rest_framework.response import Response
 from authentification.models import CustomUser
 from rest_framework import status
 from users.serilizers import UserListSerializers
+from authentification.serializers import CustomUserSerializer
+from blog.models import BlogPost
+from blog.serializer import BlogPostSerializer
+
 # Create your views here.
 class AdditionDetailsTeacher(APIView):
     def post(self,request):
@@ -74,3 +78,27 @@ class AdditionDetailsTeacher(APIView):
         except Exception:
             return Response({'errors': 'somthing problems'}, status=status.HTTP_400_BAD_REQUEST)
 
+class TeacherData(APIView):
+    def get(self,request):
+        try:
+            teacher_id=request.query_params.get('teacherId')
+            print('teacherId:',teacher_id)
+            teacher=CustomUser.objects.get(pk=teacher_id)
+            serializer=CustomUserSerializer(teacher)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error":e},status=status.HTTP_400_BAD_REQUEST)
+
+class FetchBlogData(APIView):
+    def get(self,request):
+        try:
+            user_id=request.query_params.get('userId')
+            print('userId:',user_id)
+            author=CustomUser.objects.get(pk=user_id)
+            blog=BlogPost.objects.filter(author=author).order_by('-id')
+            serializer=BlogPostSerializer(blog,many=True)
+            
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -12,4 +12,5 @@ urlpatterns = [
      path('fetchchapter',FetchChapter.as_view(),name='fetchchapter'),
      path('course-completed',CourseCompleted.as_view(),name="course-completed"),
      path('coures-completedlist',CourseCompletedList.as_view(),name='runningclass'),
+     path('fetchpaymentsData',FetchPaymentData.as_view()),
 ]

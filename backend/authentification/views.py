@@ -79,8 +79,8 @@ class RegisterView(APIView):
                 is_teacher=teacher
                 )
             print(myuser)
-            myuser.is_active=True
-            myuser.save()
+            # myuser.is_active=True
+            # myuser.save()
             print('***********')
             #email confirmation for the user
             current_site=get_current_site(request)
@@ -94,16 +94,8 @@ class RegisterView(APIView):
                 'token': generate_token.make_token(myuser),
             })
             myuser.email_user(email_subject,message2)
-            
-            # print(')))))))))))))')
-            # email = EmailMessage(
-            #     email_subject,message2,
-            #     settings.EMAIL_HOST_USER,
-            #     [myuser.email] 
-            # )
-            # email.fail_silently = True
-            # email.send()
-
+            myuser.is_active=True
+            myuser.save()
             print("-----3-----------------")
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
         except Exception as e:

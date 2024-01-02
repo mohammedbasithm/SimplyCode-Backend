@@ -16,4 +16,4 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('id', 'username','is_active' ,'email', 'phone', 'image','is_student','date_joined','is_admin','is_teacher')
+        fields = ('id', 'approvel','username','is_active' ,'email', 'phone', 'image','is_student','date_joined','is_teacher')

@@ -13,4 +13,6 @@ urlpatterns = [
     path('teacher-block',TeacherBlock.as_view(),name='teacher-block'),
     path('teacher-unblock',TeacherUnblock.as_view(),name='teacher-unblock'),
     path('teacherdetails',TeacherDetails.as_view(),name='teacher-details'),
+    path('blockcourse',BlockCourse.as_view(),name='block-course'),
+    path('unblockcourse',UnBlockCourse.as_view(),name='unblock-course'),
 ]

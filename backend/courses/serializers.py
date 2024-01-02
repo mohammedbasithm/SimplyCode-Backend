@@ -10,9 +10,9 @@ class CourseSerializer(serializers.ModelSerializer):
     instructor_username = serializers.CharField(source='instructor.username', read_only=True)
     class Meta:
         model= Course
-        fields='id','instructor_username','title','is_completed','is_subscripe','category','description','instructor','price','cover_image','about'
+        fields='id','is_active','instructor_username','title','is_completed','is_subscripe','category','description','instructor','price','cover_image','about'
 
 class ChapterSerilizer(serializers.ModelSerializer):
     class Meta:
         model=Chapter
-        fields='id','course','videos','description','chapter'
+        fields='id','course','videos','description','chapter','is_free'

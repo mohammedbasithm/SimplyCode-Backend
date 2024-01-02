@@ -9,6 +9,7 @@ from .serializers import CustomUserSerializer
 from django.db.models import Q
 from django.core.mail import send_mail
 from django.conf import settings
+from courses.models import Course
 
 # Create your views here.
 class UserList(APIView):
@@ -157,3 +158,27 @@ class TeacherDetails(APIView):
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class BlockCourse(APIView):
+    def put(self,request):
+        print("------------&& ")
+        try:
+            course_id=request.data.get('course_id')
+            course=Course.objects.get(pk=course_id)
+            course.is_active=False
+            course.save()
+            return Response({'message':'success the block course'},status=status.HTTP_200_OK)
+        except:
+            return Response({'error':'faild the block course'},status=status.HTTP_400_BAD_REQUEST)
+
+class UnBlockCourse(APIView):
+    def put(self,request):
+        try:
+            course_id=request.data.get('course_id')
+            print('course_id:',course_id)
+            course=Course.objects.get(pk=course_id)
+            course.is_active=True
+            course.save()
+            return Response({'message':'success the unblock course'},status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response (status=status.HTTP_400_BAD_REQUEST)

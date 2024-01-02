@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'channels',
     'daphne',
     'django.contrib.staticfiles',
+    'blog',
 ]
 ASGI_APPLICATION = "backend.asgi.application"
 WSGI_APPLICATION = 'backend.wsgi.application'

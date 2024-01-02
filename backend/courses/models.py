@@ -19,6 +19,7 @@ class Course(models.Model):
     about=models.CharField(blank=True,null=True)
     is_completed=models.BooleanField(default=False)
     is_subscripe=models.BooleanField(default=False)
+    is_active=models.BooleanField(default=True)
 
     def __str__(self):
         return self.title
@@ -28,6 +29,7 @@ class Chapter(models.Model):
     videos=models.FileField(upload_to='course_videos/')
     description=models.TextField()
     chapter=models.CharField(max_length=255)
+    is_free=models.BooleanField(default=False)
 
     def __str__(self):
         return self.chapter
