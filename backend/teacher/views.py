@@ -11,13 +11,11 @@ from blog.serializer import BlogPostSerializer
 # Create your views here.
 class AdditionDetailsTeacher(APIView):
     def post(self,request):
-        print('ooooo')
         try:
-            print('888888888888888888')
             id=request.data.get('user_id')
-            print(id)
+           
             user=CustomUser.objects.get(pk=id)
-            print(user)
+            
             phone=request.data.get('phone')
             qualification=request.data.get('qualification')
             bank_account=request.data.get('bankaccount')
@@ -27,11 +25,9 @@ class AdditionDetailsTeacher(APIView):
             
             errors=[]
 
-            # Basic validations
             if not phone or not phone.strip():
                 errors.append('Phone number is required')
-            # Add more validations for phone number format if needed
-
+            
             if not qualification or not qualification.strip():
                 errors.append('Qualification is required')
 
@@ -40,19 +36,16 @@ class AdditionDetailsTeacher(APIView):
 
             if not ifsc or not ifsc.strip():
                 errors.append('IFSC code is required')
-            # Add IFSC format validation using a regular expression if needed
-
+            
             if not id_proof:
                 errors.append('ID proof file is required')
 
             if not certificate:
                 errors.append('Certificate file is required')
 
-            # If there are errors, return them as a JSON response
             if errors:
                 return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
             
-            print('===================')
             if user:
                 user.phone = phone
                 user.qualification = qualification
@@ -62,17 +55,13 @@ class AdditionDetailsTeacher(APIView):
                 user.certificate = certificate
                 user.teacher_request = True
                 try:
-                    print('Before save')
                     user.save()
-                    print('After save')
-                    print('Data Submission Successfully')
                 except Exception as e:
-                    print(f'Error during save: {e}')
                     return Response({'errors': 'Error during save'}, status=status.HTTP_400_BAD_REQUEST)
                 serializer = UserListSerializers(user)
+
                 return Response({'teacher': serializer.data, 'message': 'Data Submission Successfully'},status=status.HTTP_200_OK)
             else:
-                print('User not found')
                 return Response({'errors': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception:
@@ -82,9 +71,11 @@ class TeacherData(APIView):
     def get(self,request):
         try:
             teacher_id=request.query_params.get('teacherId')
-            print('teacherId:',teacher_id)
+            
             teacher=CustomUser.objects.get(pk=teacher_id)
+
             serializer=CustomUserSerializer(teacher)
+
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error":e},status=status.HTTP_400_BAD_REQUEST)
@@ -93,12 +84,12 @@ class FetchBlogData(APIView):
     def get(self,request):
         try:
             user_id=request.query_params.get('userId')
-            print('userId:',user_id)
+
             author=CustomUser.objects.get(pk=user_id)
             blog=BlogPost.objects.filter(author=author).order_by('-id')
+            
             serializer=BlogPostSerializer(blog,many=True)
             
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Exception as e:
-            print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -13,4 +13,7 @@ urlpatterns = [
      path('course-completed',CourseCompleted.as_view(),name="course-completed"),
      path('coures-completedlist',CourseCompletedList.as_view(),name='runningclass'),
      path('fetchpaymentsData',FetchPaymentData.as_view()),
+     path('popular-course',PopularCourse.as_view(),name='popular-course'),
+     path('editcourse',EditCourse.as_view(),name='edit-course'),
+     path('course-delete',CourseDelete.as_view(),name='delete-course'),
 ]

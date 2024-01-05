@@ -10,4 +10,7 @@ urlpatterns = [
     path('teacher/createblog',AddBlog.as_view(),name='create-blog'),
     path('teacher/blogdetails',BlogDetails.as_view(),name='blog-details'),
     path('blogdelete',BlogDelete.as_view(),name='blog-delete'),
+    path('teacher/editblog-details',EditBlogDetails.as_view(),name='edit-blogdetailis'),
+    path('user/blog/blogdetails',UserBlogdetails.as_view(),name='blogDetails'),
+    path('blog/like',BlogLike.as_view(),name='blog-like'),
 ]   
