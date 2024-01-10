@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-@%-2+^o479#^m_$8zr-o_sa7mv&$c^_=7f-h!z_-ctyyu9!*dj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['51.20.84.234','0.0.0.0','127.0.0.1','localhost']
 
 AUTH_USER_MODEL = 'authentification.CustomUser'
 # Application definition
@@ -71,7 +71,12 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # Add your frontend URL here
     "https://stripe.com",
+    "http://51.20.84.234",
 ]
+CSRF_TRUSTED_ORIGINS = [
+     "http://51.20.84.234",
+]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
