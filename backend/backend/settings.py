@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-@%-2+^o479#^m_$8zr-o_sa7mv&$c^_=7f-h!z_-ctyyu9!*dj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['51.20.84.234','0.0.0.0','127.0.0.1','localhost']
+ALLOWED_HOSTS = ['51.20.84.234','0.0.0.0','127.0.0.1','localhost','symplycode.basith.shop']
 
 AUTH_USER_MODEL = 'authentification.CustomUser'
 # Application definition
@@ -72,9 +72,12 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # Add your frontend URL here
     "https://stripe.com",
     "http://51.20.84.234",
+    "https://symplycode.basith.shop",
+    "https://simply-code.vercel.app",
 ]
 CSRF_TRUSTED_ORIGINS = [
      "http://51.20.84.234",
+     "https://symplycode.basith.shop",
 ]
 
 
@@ -123,7 +126,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-SITE_URL = 'http://localhost:5173'
+# SITE_URL = 'http://localhost:5173'
+SITE_URL = 'https://simply-code.vercel.app'
 #email conf
 EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST='smtp.gmail.com'
@@ -140,7 +144,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'second_project',
-        'USER':'postgres',
+        # 'USER':'postgres',
+        'USER':'postgress',
         'PASSWORD':'basith',
         'HOST':'localhost',
         'PORT':'5432',
