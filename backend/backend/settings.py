@@ -123,7 +123,7 @@ TEMPLATES = [
         },
     },
 ]
-
+APPEND_SLASH = True
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 # SITE_URL = 'http://localhost:5173'
