@@ -192,7 +192,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "static"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
+DATA_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STRIPE_SECRET_KEY='sk_test_51OLLhGSFhIO2OA3psGRDTmh0W7KV6vSVED6l1DTHLtXMrxYHaxY6PjQnFDXcDSddnpS1mDfavBkY3U6BtRQow4bl00rYutpbL9'
