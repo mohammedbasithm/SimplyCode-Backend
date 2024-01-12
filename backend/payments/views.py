@@ -30,6 +30,10 @@ class StripeCheckoutView(APIView):
         course_image="https://www.hackhackathon.com/ImagesGallery/AdminImageGallery/imagePath/2021-04-21-04-27-5-tips-to-learn-coding-with-no-prior-experience.png"
 
         try:
+            request.session['stripe_user_id']=user_id
+            request.session['stripe_course_id']=course_id
+            request.session.save()
+
             checkout_session = stripe.checkout.Session.create(
                 line_items=[
                     {
@@ -76,47 +80,23 @@ class StripeCheckoutView(APIView):
         except Exception as e:
             return Response({'error': 'Something went wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@method_decorator(csrf_exempt, name='dispatch')
-class StripeWebhookView(APIView):
-    def post(self, request, *args, **kwargs):
-        payload = request.body
-        sig_header = request.headers.get('Stripe-Signature')
-
-        # Replace 'your_stripe_endpoint_secret' with your actual endpoint secret
-        endpoint_secret = 'your_stripe_endpoint_secret'
-
-        event = None
-
+class SuccessCheckOut(APIView):
+    def get(request,self):
         try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, endpoint_secret
-            )
-        except ValueError as e:
-            # Invalid payload
-            return JsonResponse({'error': 'Invalid payload'}, status=status.HTTP_400_BAD_REQUEST)
-        except stripe.error.SignatureVerificationError as e:
-            # Invalid signature
-            return JsonResponse({'error': 'Invalid signature'}, status=status.HTTP_400_BAD_REQUEST)
+            course_id = request.session.get('stripe_course_id')
+            user_id = request.session.get('stripe_user_id')
 
-        # Handle the event
-        if event['type'] == 'checkout.session.completed':
-            # Payment successful, retrieve relevant information from the event
-            session = event['data']['object']
-            course_id = session['metadata']['course_id']
-            user_id = session['metadata']['user_id']
+            course=Course.objects.get(pk=course_id)
+            user=CustomUser.objects.get(pk=user_id)
 
-            # Get course and user objects
-            course = Course.objects.get(pk=course_id)
-            user = CustomUser.objects.get(pk=user_id)
-
-            # Create payment record
-            payment = Payments.objects.create(
+            payment=Payments.objects.create(
                 course=course,
                 user=user,
                 teacher=course.instructor,
                 amount=course.price,
                 status='success',
-                is_paid=True,
+                is_paid=True
+                
             )
             if payment.status=='success':
                 group, created = Group.objects.get_or_create(
@@ -127,5 +107,10 @@ class StripeWebhookView(APIView):
                 group.members.add(user)
                 course.is_subscripe=True
                 course.save()
+            
+            request.session.pop('stripe_course_id', None)
+            request.session.pop('stripe_user_id', None)
 
-        return JsonResponse({'status': 'success'})
+            return Response({'message':'success'},status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
