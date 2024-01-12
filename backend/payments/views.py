@@ -33,7 +33,7 @@ class StripeCheckoutView(APIView):
             request.session['stripe_user_id']=user_id
             request.session['stripe_course_id']=course_id
             request.session.save()
-
+            print(f"Session contents after saving: {request.session.items()}")
             checkout_session = stripe.checkout.Session.create(
                 line_items=[
                     {
@@ -50,7 +50,8 @@ class StripeCheckoutView(APIView):
                 ],
                 payment_method_types=['card', ],
                 mode='payment',
-                success_url=settings.SITE_URL + '/success/?success=true&session_id={CHECKOUT_SESSION_ID}',
+                # success_url=settings.SITE_URL + '/success/?success=true&session_id={CHECKOUT_SESSION_ID}',
+                success_url = f"http://127.0.0.1:8000/api/stripe/success-checkout/?success=true&session_id={{CHECKOUT_SESSION_ID}}&course_id={course_id}&user_id={user_id}",
                 cancel_url=settings.SITE_URL+'/?canceled=true',
                 metadata={'course_id': course_id, 'user_id': user_id},
             )
@@ -72,7 +73,7 @@ class StripeCheckoutView(APIView):
             #     group.members.add(user)
             #     course.is_subscripe=True
             #     course.save()
-
+            print('8888888888888')
             response_data = {'checkout_session_url': checkout_session.url}
             return JsonResponse(response_data, status=status.HTTP_200_OK)
         except stripe.error.StripeError as e:
@@ -81,11 +82,14 @@ class StripeCheckoutView(APIView):
             return Response({'error': 'Something went wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class SuccessCheckOut(APIView):
-    def get(request,self):
+    def get(self,request):
         try:
-            course_id = request.session.get('stripe_course_id')
-            user_id = request.session.get('stripe_user_id')
-
+            print('----------------->')
+            
+            course_id = request.query_params.get('course_id')
+            user_id = request.query_params.get('user_id')
+            print(f'course_id: {course_id}')
+            print(f'user_id: {user_id}')
             course=Course.objects.get(pk=course_id)
             user=CustomUser.objects.get(pk=user_id)
 
@@ -108,9 +112,9 @@ class SuccessCheckOut(APIView):
                 course.is_subscripe=True
                 course.save()
             
-            request.session.pop('stripe_course_id', None)
-            request.session.pop('stripe_user_id', None)
-
-            return Response({'message':'success'},status=status.HTTP_200_OK)
-        except:
+            
+            success_url = f"{settings.SITE_URL}/success/?success=true&session_id={{CHECKOUT_SESSION_ID}}"
+            return redirect(success_url)
+        except Exception as e:
+            print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
