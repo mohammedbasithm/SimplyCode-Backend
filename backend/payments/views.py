@@ -11,8 +11,12 @@ from .models import Payments
 from django.urls import reverse
 from authentification.models import CustomUser
 from chat.models import Group
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 stripe.api_key =settings.STRIPE_SECRET_KEY
+
+@method_decorator(csrf_exempt, name='dispatch')
 class StripeCheckoutView(APIView):
     def post(self, request):
         course_id=request.data.get('id')
@@ -44,15 +48,75 @@ class StripeCheckoutView(APIView):
                 mode='payment',
                 success_url=settings.SITE_URL + '/success/?success=true&session_id={CHECKOUT_SESSION_ID}',
                 cancel_url=settings.SITE_URL+'/?canceled=true',
+                metadata={'course_id': course_id, 'user_id': user_id},
             )
-            payment=Payments.objects.create(
+            # payment=Payments.objects.create(
+            #     course=course,
+            #     user=user,
+            #     teacher=course.instructor,
+            #     amount=course.price,
+            #     status='success',
+            #     is_paid=True
+                
+            # )
+            # if payment.status=='success':
+            #     group, created = Group.objects.get_or_create(
+            #         course=course,
+            #         title=f"{course.title} Community",
+            #         description="Discussion and collaboration for this course."
+            #     )
+            #     group.members.add(user)
+            #     course.is_subscripe=True
+            #     course.save()
+
+            response_data = {'checkout_session_url': checkout_session.url}
+            return JsonResponse(response_data, status=status.HTTP_200_OK)
+        except stripe.error.StripeError as e:
+            return Response({'error': 'Something went wrong when creating a stripe checkout session'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return Response({'error': 'Something went wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class StripeWebhookView(APIView):
+    def post(self, request, *args, **kwargs):
+        payload = request.body
+        sig_header = request.headers.get('Stripe-Signature')
+
+        # Replace 'your_stripe_endpoint_secret' with your actual endpoint secret
+        endpoint_secret = 'your_stripe_endpoint_secret'
+
+        event = None
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, endpoint_secret
+            )
+        except ValueError as e:
+            # Invalid payload
+            return JsonResponse({'error': 'Invalid payload'}, status=status.HTTP_400_BAD_REQUEST)
+        except stripe.error.SignatureVerificationError as e:
+            # Invalid signature
+            return JsonResponse({'error': 'Invalid signature'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Handle the event
+        if event['type'] == 'checkout.session.completed':
+            # Payment successful, retrieve relevant information from the event
+            session = event['data']['object']
+            course_id = session['metadata']['course_id']
+            user_id = session['metadata']['user_id']
+
+            # Get course and user objects
+            course = Course.objects.get(pk=course_id)
+            user = CustomUser.objects.get(pk=user_id)
+
+            # Create payment record
+            payment = Payments.objects.create(
                 course=course,
                 user=user,
                 teacher=course.instructor,
                 amount=course.price,
                 status='success',
-                is_paid=True
-                
+                is_paid=True,
             )
             if payment.status=='success':
                 group, created = Group.objects.get_or_create(
@@ -64,9 +128,4 @@ class StripeCheckoutView(APIView):
                 course.is_subscripe=True
                 course.save()
 
-            response_data = {'checkout_session_url': checkout_session.url}
-            return JsonResponse(response_data, status=status.HTTP_200_OK)
-        except stripe.error.StripeError as e:
-            return Response({'error': 'Something went wrong when creating a stripe checkout session'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception as e:
-            return Response({'error': 'Something went wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({'status': 'success'})
