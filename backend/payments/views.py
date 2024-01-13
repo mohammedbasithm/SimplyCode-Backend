@@ -51,7 +51,7 @@ class StripeCheckoutView(APIView):
                 payment_method_types=['card', ],
                 mode='payment',
                 # success_url=settings.SITE_URL + '/success/?success=true&session_id={CHECKOUT_SESSION_ID}',
-                success_url = f"http://127.0.0.1:8000/api/stripe/success-checkout/?success=true&session_id={{CHECKOUT_SESSION_ID}}&course_id={course_id}&user_id={user_id}",
+                success_url = f"https://symplycode.basith.shop/api/stripe/success-checkout/?success=true&session_id={{CHECKOUT_SESSION_ID}}&course_id={course_id}&user_id={user_id}",
                 cancel_url=settings.SITE_URL+'/?canceled=true',
                 metadata={'course_id': course_id, 'user_id': user_id},
             )
